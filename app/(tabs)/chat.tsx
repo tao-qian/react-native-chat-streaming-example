@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { GiftedChat, IMessage } from 'react-native-gifted-chat';
+import { GiftedChat, IMessage, Bubble } from 'react-native-gifted-chat';
 import { v4 as uuidv4 } from 'uuid';
 import EventSource from 'react-native-sse';
 
@@ -93,6 +93,8 @@ export default function ChatScreen() {
       <GiftedChat
         messages={messages}
         onSend={messages => onSend(messages)}
+        renderBubble={ props => props.currentMessage.text ? <Bubble {...props} /> : null }
+        renderAvatar={() => null}
         user={{
           _id: 1,
           name: 'User',
