@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { v4 as uuidv4 } from 'uuid';
+import EventSource from 'react-native-sse';
 
 const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
@@ -20,79 +21,75 @@ export default function ChatScreen() {
   }, []);
 
   const fetchResponseFromOpenAI = async (messageText: string) => {
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o',
-          messages: [
-            { role: 'system', content: 'You are a helpful assistant.' },
-            { role: 'user', content: messageText },
-          ],
-          stream: true,
-        }),
-      });
+    const url = 'https://api.openai.com/v1/chat/completions';
+    const headers = {
+      'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
+    };
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+    const body = JSON.stringify({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: 'You are a helpful assistant.' },
+        { role: 'user', content: messageText },
+      ],
+      stream: true,
+    });
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let completeResponse = '';
+    const eventSource = new EventSource(url, { headers, method: 'POST', body });
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+    let completeResponse = '';
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n').filter(line => line.trim() !== '').map(line => line.replace(/^data: /, ''));
+    const listener = (event: any) => {
+      if (event.type === 'message') {
+        if (event.data !== '[DONE]') {
+          try {
+            const parsed = JSON.parse(event.data);
+            const content = parsed.choices[0]?.delta?.content || '';
+            completeResponse += content;
 
-        for (const line of lines) {
-          if (line === '[DONE]') {
-            setIsTyping(false);
+            setMessages((previousMessages) => {
+              const newMessage = {
+                _id: uuidv4(),
+                text: completeResponse,
+                createdAt: new Date(),
+                user: { _id: 2, name: 'Bot' },
+                pending: true,
+              };
+              return GiftedChat.append(previousMessages, [newMessage]);
+            });
             return;
+          } catch (error) {
+            console.error('Error parsing event data:', error, 'Raw data:', event.data);
           }
-
-          const parsed = JSON.parse(line);
-          const content = parsed.choices[0]?.delta?.content || '';
-          completeResponse += content;
-
-          setMessages((previousMessages) => {
-            const newMessage = {
-              _id: uuidv4(),
-              text: completeResponse,
-              createdAt: new Date(),
-              user: { _id: 2, name: 'Bot' },
-              pending: true,
-            };
-            return GiftedChat.append(previousMessages, [newMessage]);
-          });
+        } else {
+          console.log('Received [DONE] message');
         }
+      } else if (event.type === 'error') {
+        console.error('EventSource error:', event);
+      } else {
+        console.log('Unknown event type:', event.type);
       }
-
+      eventSource.close();
+      setIsTyping(false);
       setMessages((previousMessages) => {
         const updatedMessages = [...previousMessages];
         const lastMessage = updatedMessages.find((msg) => msg.pending);
         if (lastMessage) lastMessage.pending = false;
         return updatedMessages;
       });
+      eventSource.close();
+    };
 
-    } catch (error) {
-      console.error('Error fetching response from OpenAI:', error);
-      setIsTyping(false);
-    }
+    eventSource.addEventListener('message', listener);
+    eventSource.addEventListener('error', listener);
   };
 
   return (
     <View style={styles.container}>
       <GiftedChat
         messages={messages}
-        onSend={(messages) => onSend(messages)}
+        onSend={messages => onSend(messages)}
         user={{
           _id: 1,
           name: 'User',
