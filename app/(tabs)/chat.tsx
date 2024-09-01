@@ -37,34 +37,35 @@ export default function ChatScreen() {
     });
 
     const eventSource = new EventSource(url, { headers, method: 'POST', body });
-
-    let completeResponse = '';
+    setMessages((previousMessages) => {
+      const newMessage = {
+        _id: uuidv4(),
+        text: '',
+        createdAt: new Date(),
+        user: { _id: 2, name: 'Bot' },
+        pending: true,
+      };
+      return GiftedChat.append(previousMessages, [newMessage]);
+    });
 
     const listener = (event: any) => {
       if (event.type === 'message' && event.data !== '[DONE]') {
         try {
           const parsed = JSON.parse(event.data);
           const content = parsed.choices[0]?.delta?.content || '';
-          completeResponse += content;
-
           setMessages((previousMessages) => {
-            const newMessage = {
-              _id: uuidv4(),
-              text: completeResponse,
-              createdAt: new Date(),
-              user: { _id: 2, name: 'Bot' },
-              pending: true,
-            };
-            return GiftedChat.append(previousMessages, [newMessage]);
+            const updatedMessages = [...previousMessages];
+            const lastMessage = updatedMessages.find((msg) => msg.pending);
+            if (lastMessage) lastMessage.text = lastMessage.text + content;
+            return updatedMessages;
           });
+
           return;
         } catch (error) {
           console.error('Error parsing event data:', error, 'Raw data:', event.data);
         }
       } else if (event.type === 'error') {
         console.error('EventSource error:', event);
-      } else {
-        console.log('Unknown event type:', event.type);
       }
       eventSource.close();
       setIsTyping(false);
