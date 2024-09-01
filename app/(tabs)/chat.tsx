@@ -20,22 +20,22 @@ export default function ChatScreen() {
   }, []);
 
   const fetchResponseFromOpenAI = async (messageText: string) => {
-    const url = 'https://api.openai.com/v1/chat/completions';
-    const headers = {
-      'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      'Content-Type': 'application/json',
-    };
-
-    const body = JSON.stringify({
-      model: 'gpt-4o',
-      messages: [
-        { role: 'system', content: 'You are a helpful assistant.' },
-        { role: 'user', content: messageText },
-      ],
-      stream: true,
+    const eventSource = new EventSource('https://api.openai.com/v1/chat/completions',{
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: messageText },
+        ],
+        stream: true,
+      })
     });
 
-    const eventSource = new EventSource(url, { headers, method: 'POST', body });
     const responseMessageId = uuidv4();
     setMessages((previousMessages) => {
       const newMessage = {
