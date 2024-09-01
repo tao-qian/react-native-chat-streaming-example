@@ -6,7 +6,7 @@ import EventSource from 'react-native-sse';
 
 const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
-export default function ChatScreen() {
+export default function Index() {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
