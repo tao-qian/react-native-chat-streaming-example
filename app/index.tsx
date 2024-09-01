@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GiftedChat, IMessage, Bubble } from 'react-native-gifted-chat';
 import { v4 as uuidv4 } from 'uuid';
 import EventSource from 'react-native-sse';
