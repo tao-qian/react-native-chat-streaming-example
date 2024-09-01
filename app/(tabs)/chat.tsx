@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { GiftedChat, IMessage } from 'react-native-gifted-chat';
 import { v4 as uuidv4 } from 'uuid';
 
-const OPENAI_API_KEY = process.env.EXPO_PUBLIC_API_URL;
+const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<IMessage[]>([]);
