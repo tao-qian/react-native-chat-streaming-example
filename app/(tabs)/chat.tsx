@@ -98,7 +98,6 @@ export default function ChatScreen() {
           name: 'User',
         }}
         isTyping={isTyping}
-        maxInputLength={500}
       />
     </View>
   );
