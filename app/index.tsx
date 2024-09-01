@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { GiftedChat, IMessage, Bubble } from 'react-native-gifted-chat';
 import { v4 as uuidv4 } from 'uuid';
 import EventSource from 'react-native-sse';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 
@@ -91,7 +92,7 @@ export default function Index() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <GiftedChat
         messages={messages}
         onSend={messages => onSend(messages)}
@@ -103,7 +104,7 @@ export default function Index() {
         }}
         isTyping={isTyping}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
