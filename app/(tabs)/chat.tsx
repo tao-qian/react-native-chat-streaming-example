@@ -16,8 +16,7 @@ export default function ChatScreen() {
     );
     const messageText = newMessages[0].text;
     setIsTyping(true);
-
-    fetchResponseFromOpenAI(messageText);
+    await fetchResponseFromOpenAI(messageText);
   }, []);
 
   const fetchResponseFromOpenAI = async (messageText: string) => {
@@ -56,7 +55,9 @@ export default function ChatScreen() {
           setMessages((previousMessages) => {
             const updatedMessages = [...previousMessages];
             const lastMessage = updatedMessages.find((msg) => msg.pending);
-            if (lastMessage) lastMessage.text = lastMessage.text + content;
+            if (lastMessage) {
+              lastMessage.text = lastMessage.text + content;
+            }
             return updatedMessages;
           });
 
@@ -67,7 +68,6 @@ export default function ChatScreen() {
       } else if (event.type === 'error') {
         console.error('EventSource error:', event);
       }
-      eventSource.close();
       setIsTyping(false);
       setMessages((previousMessages) => {
         const updatedMessages = [...previousMessages];
