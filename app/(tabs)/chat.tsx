@@ -36,9 +36,10 @@ export default function ChatScreen() {
     });
 
     const eventSource = new EventSource(url, { headers, method: 'POST', body });
+    const responseMessageId = uuidv4();
     setMessages((previousMessages) => {
       const newMessage = {
-        _id: uuidv4(),
+        _id: responseMessageId,
         text: '',
         createdAt: new Date(),
         user: { _id: 2, name: 'Bot' },
@@ -53,12 +54,12 @@ export default function ChatScreen() {
           const parsed = JSON.parse(event.data);
           const content = parsed.choices[0]?.delta?.content || '';
           setMessages((previousMessages) => {
-            const updatedMessages = [...previousMessages];
-            const lastMessage = updatedMessages.find((msg) => msg.pending);
-            if (lastMessage) {
-              lastMessage.text = lastMessage.text + content;
-            }
-            return updatedMessages;
+            return previousMessages.map((message) => {
+              if (message._id === responseMessageId) {
+                return { ...message, text: message.text + content };
+              }
+              return message;
+            })
           });
 
           return;
@@ -70,10 +71,12 @@ export default function ChatScreen() {
       }
       setIsTyping(false);
       setMessages((previousMessages) => {
-        const updatedMessages = [...previousMessages];
-        const lastMessage = updatedMessages.find((msg) => msg.pending);
-        if (lastMessage) lastMessage.pending = false;
-        return updatedMessages;
+        return previousMessages.map((message) => {
+          if (message._id === responseMessageId) {
+            return { ...message, pending: false };
+          }
+          return message;
+        })
       });
       eventSource.close();
     };
