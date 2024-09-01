@@ -14,9 +14,8 @@ export default function ChatScreen() {
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, newMessages)
     );
-    const messageText = newMessages[0].text;
     setIsTyping(true);
-    await fetchResponseFromOpenAI(messageText);
+    await fetchResponseFromOpenAI(newMessages[0].text);
   }, [messages]);
 
   const fetchResponseFromOpenAI = async (messageText: string) => {
@@ -65,6 +64,7 @@ export default function ChatScreen() {
             })
           });
 
+          // Return to allow the event loop to continue when there is no error
           return;
         } catch (error) {
           console.error('Error parsing event data:', error, 'Raw data:', event.data);
@@ -72,6 +72,8 @@ export default function ChatScreen() {
       } else if (event.type === 'error') {
         console.error('EventSource error:', event);
       }
+
+      // Finished processing either because of an error or because of [DONE]
       setIsTyping(false);
       setMessages((previousMessages) => {
         return previousMessages.map((message) => {
