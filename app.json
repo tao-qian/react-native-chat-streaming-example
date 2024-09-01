@@ -14,13 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.example.change.me.streaming-chat"
+      "bundleIdentifier": "com.example.change.me.streamingchat"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.example.change.me.streamingchat"
     },
     "web": {
       "bundler": "metro",
