@@ -17,7 +17,7 @@ export default function ChatScreen() {
     const messageText = newMessages[0].text;
     setIsTyping(true);
     await fetchResponseFromOpenAI(messageText);
-  }, []);
+  }, [messages]);
 
   const fetchResponseFromOpenAI = async (messageText: string) => {
     const eventSource = new EventSource('https://api.openai.com/v1/chat/completions',{
@@ -28,10 +28,13 @@ export default function ChatScreen() {
       method: 'POST',
       body: JSON.stringify({
         model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: messageText },
-        ],
+        messages: [{ role: 'system', content: 'You are a helpful assistant.' }]
+        .concat(
+          messages.map(msg => ({
+            role: msg.user.name === 'User' ? 'user' : 'assistant',
+            content: msg.text,
+        })))
+        .concat([{ role: 'user', content: messageText }]),
         stream: true,
       })
     });
