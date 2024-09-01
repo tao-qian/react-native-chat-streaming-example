@@ -2,6 +2,16 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
+## Steps
+
+```
+npx create-expo-app@latest
+```
+
+```bash
+npx expo install react-native-gifted-chat react-native-reanimated react-native-safe-area-context react-native-get-random-values
+```
+
 ## Get started
 
 1. Install dependencies
