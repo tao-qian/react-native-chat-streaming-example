@@ -1,8 +1,8 @@
 # OpenAI Chat with Streaming in React Native
 
-This is a minimal exmaple for a chat app with streaming support in React Native, using `react-native-gifted-chat` and `react-native-sse`.
+This is a minimal example for a chat app with streaming support in React Native, using [react-native-gifted-chat](https://github.com/FaridSafi/react-native-gifted-chat) and [react-native-sse](https://github.com/binaryminds/react-native-sse).
 
-The alternative approach for streaming is fetch with Polyfill: https://github.com/expo/expo/discussions/21710. However, that's harder to set up and also has some performance issues.
+The alternative approach for streaming is fetch with Polyfill: https://github.com/expo/expo/discussions/21710.
 
 ## Get started
 
