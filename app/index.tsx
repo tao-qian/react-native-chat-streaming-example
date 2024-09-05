@@ -11,15 +11,15 @@ export default function Index() {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
-  const onSend = useCallback(async (newMessages: IMessage[] = []) => {
+  const onSend = useCallback((newMessages: IMessage[] = []) => {
     setMessages((previousMessages) =>
       GiftedChat.append(previousMessages, newMessages)
     );
-    setIsTyping(true);
-    await fetchResponseFromOpenAI(newMessages[0].text);
+    fetchResponseFromOpenAI(newMessages[0].text);
   }, [messages]);
 
-  const fetchResponseFromOpenAI = async (messageText: string) => {
+  const fetchResponseFromOpenAI = (messageText: string) => {
+    setIsTyping(true);
     const eventSource = new EventSource('https://api.openai.com/v1/chat/completions',{
       headers: {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
