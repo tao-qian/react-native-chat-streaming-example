@@ -1,6 +1,6 @@
 # OpenAI Chat with Streaming in React Native
 
-![Demo](./demo.gif)
+<img src="./demo.gif" width="200" alt="Demo">
 
 This is a minimal example for a chat app with streaming support in React Native, using [react-native-gifted-chat](https://github.com/FaridSafi/react-native-gifted-chat) and [react-native-sse](https://github.com/binaryminds/react-native-sse).
 
